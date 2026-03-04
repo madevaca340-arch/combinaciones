@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Combinaciones - Módulo Interactivo</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom,#dbeafe,#ffffff);
+    text-align:center;
+    overflow:hidden;
+}
+
+/* PERSONAJE */
+.personaje{
+    margin-top:30px;
+    animation: mover 2s infinite ease-in-out;
+}
+
+@keyframes mover{
+    0%{transform: translateY(0);}
+    50%{transform: translateY(-8px);}
+    100%{transform: translateY(0);}
+}
+
+.cabeza{
+    width:120px;
+    height:120px;
+    background:#FFD8B1;
+    border-radius:50%;
+    margin:auto;
+    position:relative;
+}
+
+.ojo{
+    width:15px;
+    height:15px;
+    background:black;
+    border-radius:50%;
+    position:absolute;
+    top:40px;
+}
+
+.ojo.izq{ left:30px; }
+.ojo.der{ right:30px; }
+
+.boca{
+    width:40px;
+    height:15px;
+    background:#c0392b;
+    border-radius:0 0 20px 20px;
+    position:absolute;
+    bottom:30px;
+    left:40px;
+    transition:0.1s;
+}
+
+.cuerpo{
+    width:80px;
+    height:120px;
+    background:#4CAF50;
+    margin:auto;
+    border-radius:10px;
+}
+
+/* OBJETOS */
+.objetos{
+    position:absolute;
+    bottom:40px;
+    width:100%;
+    display:none;
+}
+
+.objetos img{
+    width:70px;
+    position:absolute;
+    transition: all 1.5s ease-in-out;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="personaje">
+    <div class="cabeza">
+        <div class="ojo izq"></div>
+        <div class="ojo der"></div>
+        <div class="boca" id="boca"></div>
+    </div>
+    <div class="cuerpo"></div>
+</div>
+
+<div class="objetos" id="zonaObjetos">
+    <img src="https://cdn-icons-png.flaticon.com/512/415/415733.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
+    <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png">
+</div>
+
+<audio id="musica" loop autoplay>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5f4b3c6f6a.mp3?filename=soft-background-music-12146.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+// DEFINICIÓN CORRECTA
+const texto = `
+Una combinación es una forma de seleccionar 
+varios elementos de un conjunto, 
+donde el orden no cambia el resultado. 
+Esto significa que elegir A, B y C 
+es lo mismo que elegir C, B y A. 
+En las combinaciones importa 
+qué elementos se escogen, 
+pero no importa el orden en que se escriben. 
+Las combinaciones nos permiten contar 
+cuántos grupos diferentes se pueden formar 
+sin repetir los mismos elementos en distinto orden.
+`;
+
+const boca = document.getElementById("boca");
+let intervaloBoca;
+
+function hablar(){
+    const mensaje = new SpeechSynthesisUtterance(texto);
+    mensaje.lang="es-ES";
+    mensaje.rate=0.9;
+
+    intervaloBoca = setInterval(()=>{
+        boca.style.height = boca.style.height==="25px"?"15px":"25px";
+    },150);
+
+    mensaje.onend=function(){
+        clearInterval(intervaloBoca);
+        boca.style.height="15px";
+        iniciarCombinaciones();
+    }
+
+    speechSynthesis.speak(mensaje);
+}
+
+// COMBINACIONES REALES (4 objetos tomados de 3 en 3)
+function iniciarCombinaciones(){
+    const zona=document.getElementById("zonaObjetos");
+    zona.style.display="block";
+
+    const objetos=zona.querySelectorAll("img");
+
+    const posiciones=[
+        [20,40,60],
+        [20,40,80],
+        [20,60,80],
+        [40,60,80]
+    ];
+
+    let indice=0;
+
+    setInterval(()=>{
+        objetos.forEach(obj=>{
+            obj.style.opacity="0";
+        });
+
+        setTimeout(()=>{
+            objetos.forEach((obj,i)=>{
+                if(i<3){
+                    obj.style.left=posiciones[indice][i]+"%";
+                    obj.style.bottom="120px";
+                    obj.style.opacity="1";
+                }else{
+                    obj.style.opacity="0";
+                }
+            });
+
+            indice=(indice+1)%posiciones.length;
+
+        },500);
+
+    },3000);
+}
+
+window.onload=function(){
+    document.getElementById("musica").volume=0.2;
+    hablar();
+};
+
+</script>
+
+</body>
+</html>
